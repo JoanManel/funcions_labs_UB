@@ -1,6 +1,19 @@
 # funcions_labs_UB
 Aquesta llibreria conté funcions de suport en els laboratoris docents del Grau de Física de la Universitat de Barcelona. Inclou eines per a la lectura de dades, ajustos de corbes, representació gràfica i models matemàtics habituals.
 
+## Versió per als estudiants
+
+- [Documentació de la llibreria](Documentacio_funcions_labs.pdf)
+- [Quadern d'exemples actualitzat](Exemples_f_labs.ipynb) i [versió PDF](Exemples_f_labs.pdf)
+- [Dades d'exemple](Dades_Exemple): cal conservar aquesta carpeta al costat del quadern.
+
+Dependències: numpy, pandas, matplotlib, scipy i IPython.
+
+`mostra_dades` retorna `(ax, resultats)`; sense model, `resultats` és `None`. Admet un eix existent amb `ax` i un color amb `color`.
+`mostra_varies_series(series, mida_figura=(6,4), xlabel="x", ylabel="y", titol=None)` representa diverses sèries i retorna l'eix.
+
+El quadern vigent és `Exemples_f_labs.ipynb` (amb E majúscula). Es conserven el quadern antic amb e minúscula i les dades de l'arrel per compatibilitat.
+
 # Funcions principals
 
 ## `llegeix_dades`
@@ -9,7 +22,7 @@ Llegeix un fitxer de dades delimitat per tabuladors, comes o altres separadors.
 
 ```python
 llegeix_dades(path, separador='\t', comentari='#', skip=0)
-````
+```
 
 **Retorna:** Array o tupla d'arrays amb les columnes de dades.
 
@@ -31,7 +44,7 @@ Fa un ajust als punts de dades proporcionats segons un model donat. Està pensad
 
 ```python
 ajusta_dades(x, y, funcio_model, incert_y=None, x_min=None, x_max=None, 
-             exclude=None, v_i=None)
+             exclude=None, v_i=None, incert_x=None)
 ```
 
 **Retorna:** Diccionari amb paràmetres ajustats, errors, χ², RMSE, R² i màscara de punts usats.
@@ -48,7 +61,7 @@ mostra_dades(x, y, funcio_model=None, incert_x=None, incert_y=None,
              xlabel='x', ylabel='y', forma='o',
              x_min=None, x_max=None, exclude=None, 
              mida_figura=(4.5, 4), label_dades="Dades",
-             valors_inicials=None, ponderacio=True)
+             valors_inicials=None, ponderacio=True, ax=None, color=None)
 ```
 
 # Models matemàtics disponibles
