@@ -40,7 +40,11 @@ def format_resultat(valor, incertesa):
         exp_incert = floor(log10(abs(mant_incertesa)))
         primera_cifra = int(mant_incertesa / 10**exp_incert)
         xifres = 2 if primera_cifra == 1 else 1
-        decimals = max(0, -exp_incert + (xifres - 1))
+        decimals = -exp_incert + (xifres - 1)
+        # Els decimals negatius arrodoneixen a desenes, centenes, etc.
+        mant_valor = round(mant_valor, decimals)
+        mant_incertesa = round(mant_incertesa, decimals)
+        decimals = max(0, decimals)  # El format de text requereix decimals >= 0.
         
         if exp != 0:
             format_str=fr"({mant_valor:.{decimals}f} \pm {mant_incertesa:.{decimals}f}) \times 10^{{{exp}}}"
