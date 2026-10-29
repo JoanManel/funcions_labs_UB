@@ -44,7 +44,7 @@ Fa un ajust als punts de dades proporcionats segons un model donat. Està pensad
 
 ```python
 ajusta_dades(x, y, funcio_model, incert_y=None, x_min=None, x_max=None, 
-             exclude=None, v_i=None, incert_x=None)
+             exclude=None, v_i=None, incert_x=None, exclude_x=None)
 ```
 
 **Retorna:** Diccionari amb paràmetres ajustats, errors, χ², RMSE, R² i màscara de punts usats.
@@ -61,7 +61,7 @@ mostra_dades(x, y, funcio_model=None, incert_x=None, incert_y=None,
              xlabel='x', ylabel='y', forma='o',
              x_min=None, x_max=None, exclude=None, 
              mida_figura=(4.5, 4), label_dades="Dades",
-             valors_inicials=None, ponderacio=True, ax=None, color=None)
+             valors_inicials=None, ponderacio=True, ax=None, color=None, exclude_x=None)
 ```
 
 # Models matemàtics disponibles
@@ -77,3 +77,24 @@ Tots aquests models accepten un argument opcional `option="Text"` que retorna un
 * `model_lorentziana(x, A, x0, gamma)`: Lorentziana
 * `model_sinus(x, a0, a1, a2)`: y = a0 · sin(a1 · x + a2)
 
+
+## Exclusió de punts
+
+En `ajusta_dades` i `mostra_dades`, `exclude` indica sempre índexs de les
+**dades originals**, començant per 0, abans de filtrar amb `x_min` o `x_max`.
+`exclude=None` i `exclude=[]` no exclouen cap punt. S’accepten llistes o arrays
+NumPy unidimensionals d’enters. Els índexs negatius, fora de rang, decimals
+i booleans es rebutgen.
+
+```python
+exclude=[1, 2]                # Segon i tercer punt
+exclude=np.array([1, 2])      # Mateix resultat
+exclude_x=[1.5, 3.0]          # Tots els punts amb aquests valors de x
+```
+
+`exclude_x` compara els valors exactament, sense tolerància, i exclou també
+els valors repetits. Es pot combinar amb `exclude` i amb els límits del rang.
+També es pot incloure en els diccionaris de `mostra_varies_series`.
+
+**Canvi de comportament:** si abans passaves valors de x decimals a `exclude`,
+ara has de passar-los a `exclude_x`.

@@ -60,8 +60,27 @@ def format_resultat(valor, incertesa):
             format_str=format_str+ fr" \times 10^{{{exp}}}"
         return format_str
 
+def mascara_exclusions(n, exclude=None):
+    """Retorna una màscara; exclude són índexs originals, començant per 0."""
+    mask = np.ones(n, dtype=bool)
+    if exclude is None:
+        return mask
+    indexs = np.asarray(exclude)
+    if indexs.ndim != 1:
+        raise ValueError("exclude ha de ser una llista unidimensional d'índexs.")
+    if indexs.size == 0:
+        return mask
+    if indexs.dtype.kind not in "iu":
+        raise ValueError("Els índexs d'exclude han de ser enters; per valors de x, usa exclude_x.")
+    if np.any(indexs < 0) or np.any(indexs >= n):
+        raise ValueError("Els índexs d'exclude han de complir 0 <= índex < len(x).")
+    mask[indexs] = False
+    return mask
+
+
 def ajusta_dades(x, y, funcio_model, incert_y=None, x_min=None, x_max=None,
-                 exclude=None, v_i=None, incert_x=None):
+                 exclude=None, v_i=None, incert_x=None, exclude_x=None):
+    """exclude: índexs originals (base 0); exclude_x: valors de x, coincidència exacta."""
     #aquesta funció ajusta les dades a un cert model. En cas que les dades y tinguin incerteses es fa servir minims quadrats ponderats.
     x = np.asarray(x, dtype=float)
     y = np.asarray(y, dtype=float)
@@ -98,11 +117,9 @@ def ajusta_dades(x, y, funcio_model, incert_y=None, x_min=None, x_max=None,
     if x_max is not None:
         mask &= x <= x_max
     # Exclusió de punts
-    if exclude is not None:
-        if isinstance(exclude[0], int):
-            mask[exclude] = False
-        else:
-            mask &= ~np.isin(x, exclude)
+    mask &= mascara_exclusions(len(x), exclude)
+    if exclude_x is not None:
+        mask &= ~np.isin(x, exclude_x)
     x_fit = x[mask]
     y_fit = y[mask]
     incert_x_fit = incert_x[mask] if incert_x is not None else None
@@ -218,11 +235,13 @@ def mostra_dades(x, y, funcio_model=None, incert_x=None, incert_y=None,
                  x_min=None, x_max=None, exclude=None, 
                  mida_figura=(4.5, 4), label_dades="Dades",
                  valors_inicials=None, ponderacio=True,
-                 ax=None, color=None):
+                 ax=None, color=None, exclude_x=None):
     """Representa les dades i retorna la parella ``(ax, resultats)``.
 
     ``resultats`` és el diccionari retornat per ``ajusta_dades`` quan es
     proporciona un model d'ajust, i ``None`` quan només es representen dades.
+    ``exclude`` conté índexs originals (base 0); ``exclude_x`` conté valors
+    de x que s’exclouen per coincidència exacta, incloent-hi els repetits.
     """
     
     x = np.asarray(x)
@@ -250,11 +269,9 @@ def mostra_dades(x, y, funcio_model=None, incert_x=None, incert_y=None,
         mask &= x >= x_min
     if x_max is not None:
         mask &= x <= x_max
-    if exclude is not None:
-        if isinstance(exclude[0], int):
-            mask[exclude] = False
-        else:
-            mask &= ~np.isin(x, exclude)
+    mask &= mascara_exclusions(len(x), exclude)
+    if exclude_x is not None:
+        mask &= ~np.isin(x, exclude_x)
 
         # Mostra dades excloses (només si n'hi ha)
     if not np.all(mask):
@@ -276,10 +293,12 @@ def mostra_dades(x, y, funcio_model=None, incert_x=None, incert_y=None,
         if ponderacio:
             resultats = ajusta_dades(x, y, funcio_model,
                                  incert_x=incert_x, incert_y=incert_y,
-                                 x_min=x_min, x_max=x_max, exclude=exclude,v_i=valors_inicials)
+                                 x_min=x_min, x_max=x_max, exclude=exclude,v_i=valors_inicials,
+                                 exclude_x=exclude_x)
         else:
             resultats = ajusta_dades(x, y, funcio_model,
-                                 x_min=x_min, x_max=x_max, exclude=exclude,v_i=valors_inicials)
+                                 x_min=x_min, x_max=x_max, exclude=exclude,v_i=valors_inicials,
+                                 exclude_x=exclude_x)
         popt = resultats['popt']
 
        # x_dense = np.linspace(min(x[mask]), max(x[mask]), 500)
