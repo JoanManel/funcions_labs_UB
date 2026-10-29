@@ -98,3 +98,18 @@ També es pot incloure en els diccionaris de `mostra_varies_series`.
 
 **Canvi de comportament:** si abans passaves valors de x decimals a `exclude`,
 ara has de passar-los a `exclude_x`.
+
+## Font de la documentació
+
+[Documentacio.tex](Documentacio.tex) conté la documentació actualitzada, amb figures a [docs/figures](docs/figures).
+
+Per regenerar les figures i compilar des de l'arrel:
+
+```sh
+python docs/genera_figures.py
+pdflatex Documentacio.tex
+pdflatex Documentacio.tex
+```
+
+Cal una instal·lació LaTeX amb català per a Babel, listings i els paquets indicats al preàmbul. El resultat és `Documentacio.pdf`.
+**El PDF anterior, `Documentacio_funcions_labs.pdf`, encara no s'ha regenerat amb aquestes correccions.** El font LaTeX és la referència actualitzada.
