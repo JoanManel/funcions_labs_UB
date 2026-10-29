@@ -361,22 +361,56 @@ mostra_dades (x , y , funcio_model = model_exponencial,
 \caption{Ajust a una funció exponencial \( y = a_0 e^{a_1 x} \) amb incerteses emprant escala logarítmica en l'eix vertical.}
 \end{figure}
 
-\subsection*{5. Ajust sinusoidal}
+\subsection*{5. Ajust sinusoidal: importància dels valors inicials}
+
+El model \(y=a_0\sin(a_1x+a_2)\) és no lineal en la freqüència angular
+\(a_1\) i la fase \(a_2\). L'algorisme cerca un mínim local: una estimació
+inicial inadequada pot conduir a una corba que no descriu les dades,
+encara que el càlcul acabi sense errors. Això és diferent de no convergir.
+
+Comparem els dos ajustos sobre les mateixes dades simulades. Sense
+\texttt{valors\_inicials}, en aquest exemple els tres paràmetres parteixen
+ del valor 1. En el segon intent proporcionem una estimació aproximada.
 
 \begin{lstlisting}
-x = np . linspace (0 , 2* np . pi , 50)
+x = np.linspace(0, 2*np.pi, 50)
 np.random.seed(1)
-y = 3 * np.sin(2.5 * x + 0.5) + np.random.normal (0, 0.3, len(x))
-mostra_dades (x , y , funcio_model = model_sinus,
-    titol = 'Ajust sinusoidal', valors_inicials =[2 ,3, 0])
+y = 3*np.sin(2.5*x + 0.5) + np.random.normal(0, 0.3, len(x))
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4),
+                         constrained_layout=True)
+ax0, r0 = mostra_dades(x, y, funcio_model=model_sinus,
+                       ax=axes[0])
+ax1, r1 = mostra_dades(x, y, funcio_model=model_sinus,
+                       valors_inicials=[2, 3, 0], ax=axes[1])
+axes[0].set_title('Valors inicials per defecte')
+axes[1].set_title('Estimacions inicials [2, 3, 0]')
+for ax in axes:
+    ax.legend()
+    ax.grid(True)
+print('RMSE:', r0['rmse'], r1['rmse'])
 \end{lstlisting}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.7\textwidth]{fig4_sin.png}
-\caption{Ajust sinusoidal proporcionant una estimació inicial dels paràmetres a ajustar.}
+\includegraphics[width=\textwidth]{fig4_sin.png}
+\caption{Les mateixes dades amb dues inicialitzacions. Amb els valors per
+ defecte, l'ajust queda en una solució inadequada; amb una estimació
+ inicial propera, recupera les oscil·lacions.}
 \end{figure}
 
+Per estimar els paràmetres a partir del gràfic, podem prendre l'amplitud
+com la meitat de la diferència entre màxim i mínim i estimar el període
+\(T\) entre dos màxims consecutius. La freqüència angular inicial serà
+\(a_1\simeq2\pi/T\); la fase es pot estimar a partir de la posició d'un
+màxim o d'un pas per zero. No cal conèixer els valors exactes.
+
+Convé provar diverses estimacions plausibles, inspeccionar els residus
+i comparar l'RMSE sobre les mateixes dades. Un RMSE petit, per si sol,
+no demostra que el model sigui físicament correcte ni garanteix haver
+trobat el mínim global. En aquest exemple no s'han proporcionat incerteses,
+per la qual cosa comparem l'RMSE i no interpretem el camp
+\texttt{chi2\_reduced} com un $\chi^2$ estadístic.
 
 \subsection*{6. Exemple amb \texttt{mostra\_varies\_series}}
 Permet representar diverses sèries de dades en una mateixa figura, amb ajustos independents. A cada sèrie li podem posar les mateixes opcions que a la funció \texttt{mostra\_dades}. 

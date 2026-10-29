@@ -112,4 +112,4 @@ pdflatex Documentacio.tex
 ```
 
 Cal una instal·lació LaTeX amb català per a Babel, listings i els paquets indicats al preàmbul. El resultat és `Documentacio.pdf`.
-**El PDF anterior, `Documentacio_funcions_labs.pdf`, encara no s'ha regenerat amb aquestes correccions.** El font LaTeX és la referència actualitzada.
+El PDF publicat, [Documentacio_funcions_labs.pdf](Documentacio_funcions_labs.pdf), està recompilat amb les correccions i la comparació dels ajustos sinusoidals.
